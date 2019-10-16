@@ -18,9 +18,43 @@
 void     SystemClock_Config(void);
 #define LED_PORT GPIOA
 #define LED_PIN LL_GPIO_PIN_5
+#define PWM_PORT GPIOC
+#define PWM_PIN LL_GPIO_PIN_10
+
 
 int tick = 0;
 int expe = 0;
+
+void SystemClock_Config2(void){
+	/* MSI configuration and activation */
+	LL_RCC_MSI_EnableRangeSelection();
+	LL_RCC_MSI_SetRange(LL_RCC_MSIRANGE_9);
+	LL_RCC_MSI_Enable();
+	while	(LL_RCC_MSI_IsReady() != 1)
+		{ };
+
+	/* Main PLL configuration and activation */
+	/*LL_RCC_PLL_ConfigDomain_SYS(LL_RCC_PLLSOURCE_MSI, LL_RCC_PLLM_DIV_1, 40, LL_RCC_PLLR_DIV_2);
+	LL_RCC_PLL_Enable();
+	LL_RCC_PLL_EnableDomain_SYS();
+	while(LL_RCC_PLL_IsReady() != 1)
+		{ };*/
+
+	/* Sysclk activation on the main PLL */
+	LL_RCC_SetAHBPrescaler(LL_RCC_SYSCLK_DIV_1);
+	LL_RCC_SetSysClkSource(LL_RCC_SYS_CLKSOURCE_MSI);
+	while(LL_RCC_GetSysClkSource() != LL_RCC_SYS_CLKSOURCE_STATUS_MSI)
+		{ };
+
+	/* Set APB1 & APB2 prescaler*/
+	LL_RCC_SetAPB1Prescaler(LL_RCC_APB1_DIV_1);
+	LL_RCC_SetAPB2Prescaler(LL_RCC_APB2_DIV_1);
+
+	LL_FLASH_SetLatency(LL_FLASH_LATENCY_1);
+
+	/* Update the global variable called SystemCoreClock */
+	SystemCoreClockUpdate();
+}
 
 void SysTick_Handler(void){
 	//LL_GPIO_TogglePin(LED_PORT, LED_PIN);
@@ -33,21 +67,33 @@ void SysTick_Handler(void){
 		stateLed = 0;
 	}*/
 	tick++;
-	if(tick%20 == 0) {
+	if(tick%2 == 1){
+		LL_GPIO_SetOutputPin(PWM_PORT, PWM_PIN );
+	}
+	else{
+		LL_GPIO_ResetOutputPin(PWM_PORT, PWM_PIN );
+	}
+	if(tick == expe*5) {
 		LED_GREEN(0);
+	}
+	else if(tick > 100) {
+		LED_GREEN(1);
 		tick = 0;
 	}
-	else if(tick%10 == 0) {
-		LED_GREEN(1);
-	}
-	if()
+	/*if(expe == 1){
+		LL_LPM_EnableSleep();
+	}*/
 }
 
 int main(void)
 {
-
+int stateButton = 0;
+expe = 2;
 /* Configure the system clock */
-SystemClock_Config();
+if (expe == 2){
+	SystemClock_Config2();
+}
+else SystemClock_Config();
 // config GPIO
 GPIO_init();
 
@@ -59,10 +105,12 @@ SysTick_Config(SystemCoreClock/100);
 
 while (1) {
 	if	( BLUE_BUTTON() ) {
+		stateButton = 1;
+ 	}
+	if(stateButton == 1){
 		LL_LPM_EnableSleep();
 		__WFI();
-		expe = 1;
- 	}
+	}
  }
 }
 
