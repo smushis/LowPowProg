@@ -23,7 +23,7 @@ void     SystemClock_Config(void);
 
 
 int tick = 0;
-int expe = 0;
+int expe = 2;
 
 void SystemClock_Config2(void){
 	/* MSI configuration and activation */
@@ -103,11 +103,25 @@ GPIO_init();
 //SysTick->CTRL |= 2;
 SysTick_Config(SystemCoreClock/100);
 
+//Activation du LSE pour future calibration
+if(expe == 2) {
+	LL_RCC_LSE_Enable ();
+}
+
+
+
 while (1) {
 	if	( BLUE_BUTTON() ) {
 		stateButton = 1;
  	}
 	if(stateButton == 1){
+
+		//Activation de la calibration du MSI
+		if(expe == 2) {
+			LL_RCC_MSI_EnablePLLMode();
+		}
+
+
 		LL_LPM_EnableSleep();
 		__WFI();
 	}

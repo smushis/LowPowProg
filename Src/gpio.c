@@ -9,6 +9,8 @@
 #define LED_PIN LL_GPIO_PIN_5
 #define BUT_PORT GPIOC
 #define BUT_PIN LL_GPIO_PIN_13
+#define PWM_PORT GPIOC
+#define PWM_PIN LL_GPIO_PIN_10
 
 void GPIO_init(void)
 {
@@ -22,6 +24,9 @@ LL_GPIO_SetPinOutputType( LED_PORT, LED_PIN, LL_GPIO_OUTPUT_PUSHPULL );
 LL_AHB2_GRP1_EnableClock( LL_AHB2_GRP1_PERIPH_GPIOC );
 // bouton bleu pin 13
 LL_GPIO_SetPinMode( BUT_PORT, BUT_PIN, LL_GPIO_MODE_INPUT );
+// PC10
+LL_GPIO_SetPinMode( PWM_PORT, PWM_PIN, LL_GPIO_MODE_OUTPUT );
+
 }
 
 
