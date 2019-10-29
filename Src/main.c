@@ -105,7 +105,14 @@ SysTick_Config(SystemCoreClock/100);
 
 //Activation du LSE pour future calibration
 if(expe == 2) {
-	LL_RCC_LSE_Enable ();
+	LL_APB1_GRP1_EnableClock(LL_APB1_GRP1_PERIPH_PWR);
+	LL_PWR_EnableBkUpAccess();
+	if(!LL_RCC_LSE_IsReady()){
+	    LL_RCC_ForceBackupDomainReset();
+	    LL_RCC_ReleaseBackupDomainReset();
+		LL_RCC_LSE_Enable();
+	}
+	LL_RCC_MSI_EnablePLLMode();
 }
 
 
