@@ -152,14 +152,29 @@ if(BLUE_BUTTON()){
 
 
 /* Configure the system clock */
-if (expe == 2){
-	SystemClock_Config2();
-}
-else SystemClock_Config();
 
-if(expe == 2) {
+switch(expe){
+case 1:
+	SystemClock_Config();
+	break;
+case 2:
+	SystemClock_Config2();
 	MSICalibration_Process();
+	break;
+case 3:
+	break;
+case 4:
+	break;
+case 5:
+	break;
+case 6:
+	break;
+case 7:
+	break;
+case 8:
+	break;
 }
+SystemCoreClockUpdate();
 
 // Configuration du SysTick
 // A faire une fois que les clocks sont ocnfigurées
